@@ -1,9 +1,12 @@
-def load_demo():
+def load_demo(file='misc.csv'):
     '''Load in the hiring information into appropriate variables'''
     import csv
     import numpy as np
+
+    #file = misc.csv: hiring statistics from rumor mill
+    #file = misc2.csv: hiring statistics from select departments
     
-    with open('misc.csv') as fp:
+    with open(file) as fp:
         reader = csv.reader(fp,delimiter=',')
         next(reader,None)
         data_read = [row for row in reader]
@@ -15,7 +18,7 @@ def load_demo():
     carnegie_class = []
 
     for i in range(n):
-        if data_read[i][3] != 'X' and data_read[i][1] != '1900':
+        if data_read[i][3] != 'X' and data_read[i][1] != '1900' and data_read[i][2]!='X' and data_read[i][1]!='X':
             if data_read[i][0] == 'M':
                 gender.append(0)
             else:
@@ -33,14 +36,14 @@ def load_demo():
 
     return gender,phd_year,hire_year,carnegie_class
 
-def plot_demo(full=False):
+def plot_demo(file='misc.csv',full=False):
     ''' Plot the distribution of time to faculty job for men/women '''
 
     import numpy as np
     import matplotlib.pyplot as plt
     from scipy.stats import ks_2samp
 
-    gender,phd_year,hire_year,carnegie_class = load_demo()       
+    gender,phd_year,hire_year,carnegie_class = load_demo(file)       
     wmale = (gender == 0) & (phd_year > 2000)
     wfemale = (gender == 1) & (phd_year > 2000)
     wr1 = (carnegie_class == 0) & (phd_year > 2000)
@@ -96,17 +99,17 @@ def plot_demo(full=False):
         d,p = ks_2samp(hire_year[wmale]-phd_year[wmale],hire_year[wfemale]-phd_year[wfemale])
         print 'Prob: ',p
 
-        print ' '
-        print 'Time to faculty (R1), Men: {:0.2f}+-{:0.2f}'.format(np.mean(hire_year[wmr1]-phd_year[wmr1]),np.mean(hire_year[wmr1]-phd_year[wmr1])/np.sqrt(wmr1.sum()))
-        print 'Time to faculty (R1), Female: {:0.2f}+-{:0.2f} '.format(np.mean(hire_year[wfr1]-phd_year[wfr1]),np.mean(hire_year[wfr1]-phd_year[wfr1])/np.sqrt(wfr1.sum()))
-        d,p = ks_2samp(hire_year[wmr1]-phd_year[wmr1],hire_year[wfr1]-phd_year[wfr1])
-        print 'Prob: ',p
+        #print ' '
+        #print 'Time to faculty (R1), Men: {:0.2f}+-{:0.2f}'.format(np.mean(hire_year[wmr1]-phd_year[wmr1]),np.mean(hire_year[wmr1]-phd_year[wmr1])/np.sqrt(wmr1.sum()))
+        #print 'Time to faculty (R1), Female: {:0.2f}+-{:0.2f} '.format(np.mean(hire_year[wfr1]-phd_year[wfr1]),np.mean(hire_year[wfr1]-phd_year[wfr1])/np.sqrt(wfr1.sum()))
+        #d,p = ks_2samp(hire_year[wmr1]-phd_year[wmr1],hire_year[wfr1]-phd_year[wfr1])
+        #print 'Prob: ',p
 
-        print ' '
-        print 'Time to faculty (Not R1), Men: {:0.2f}+-{:0.2f} '.format(np.mean(hire_year[wmnr1]-phd_year[wmnr1]),np.mean(hire_year[wmnr1]-phd_year[wmnr1])/np.sqrt(wmnr1.sum()))
-        print 'Time to faculty (Not R1), Female: {:0.2f}+-{:0.2f} '.format(np.mean(hire_year[wfnr1]-phd_year[wfnr1]),np.mean(hire_year[wfnr1]-phd_year[wfnr1])/np.sqrt(wfnr1.sum()))
-        d,p = ks_2samp(hire_year[wmnr1]-phd_year[wmnr1],hire_year[wfnr1]-phd_year[wfnr1])
-        print 'Prob: ',p
+        #print ' '
+        #print 'Time to faculty (Not R1), Men: {:0.2f}+-{:0.2f} '.format(np.mean(hire_year[wmnr1]-phd_year[wmnr1]),np.mean(hire_year[wmnr1]-phd_year[wmnr1])/np.sqrt(wmnr1.sum()))
+        #print 'Time to faculty (Not R1), Female: {:0.2f}+-{:0.2f} '.format(np.mean(hire_year[wfnr1]-phd_year[wfnr1]),np.mean(hire_year[wfnr1]-phd_year[wfnr1])/np.sqrt(wfnr1.sum()))
+        #d,p = ks_2samp(hire_year[wmnr1]-phd_year[wmnr1],hire_year[wfnr1]-phd_year[wfnr1])
+        #print 'Prob: ',p
 
 
 def basic_model(success=[1,1,1,1,1,1,1,1,1,1],plot_model=True,male_only=False,female_only=False):
@@ -378,7 +381,7 @@ def gendered_model1(success=[1,1,1,1,1,1,1,1,1,1],slope=.01):
 
 def gendered_model2(success=[1,1,1,1,1,1,1,1,1,1],bias=1):
     '''A test of a gendered model.
-       This model includes bias towards hiring women (either because women are more qualified for faculty jobs, or because efforts at diversity in hiring lead to more frequenct hiring of women).
+       This model includes bias towards hiring women (either because women are more qualified for faculty jobs, or because efforts at diversity in hiring lead to more frequenct hiring of women). The number of men hired per year is Nhire, while the number of women hired per year is bias*Nhire.
     '''
     import numpy as np
     import matplotlib.pyplot as plt
@@ -506,6 +509,123 @@ def gendered_model2(success=[1,1,1,1,1,1,1,1,1,1],bias=1):
     #bias=1.2 fits the short-timescale (<=2 years) side of the distribution, but does much worse on the high timescale (3-9 years) side of the distribution
 
 
+def gendered_model2b(success=[1,1,1,1,1,1,1,1,1,1],bias=1.):
+    '''A test of a gendered model.
+       This model includes a bias towards hiring women. Unlike gendered_model2, here the bias is an increase if the relative probability of hiring a women compared to hiring a man
+    '''
+    import numpy as np
+    import matplotlib.pyplot as plt
+    
+    gender,phd_year,hire_year,carnegie_class = load_demo()
+    
+    wnonzero = np.array(success)<0
+    wlarge = np.array(success)>1
+    if wnonzero.sum()>0 or wlarge.sum()>0:
+        return -np.inf
+
+    labor_pool = []
+    phdy_labor_pool = []
+
+    hired_pool = []
+    phdy_hired_pool = []
+    hirey_hired_pool = []
+
+    
+    mfrac = .7
+    ffrac = 1-mfrac
+
+    Nadd = 30000 #number of people added to the labor pool, per year
+
+    #Populate labor pool. Assume the number of people added per year is constant, and the fraction of women is constant per year
+    for year in range(2000,2017):
+        labor_pool.extend(int(mfrac*Nadd)*[0,])
+        labor_pool.extend(int(ffrac*Nadd)*[1,])
+        phdy_labor_pool.extend((int(mfrac*Nadd)+int(ffrac*Nadd))*[year,])
+
+    labor_pool = np.array(labor_pool)
+    phdy_labor_pool = np.array(phdy_labor_pool)
+
+    #Populate hired pool. Start 5 years after beginning of labor pool. Randomly select people from labor pool
+    Nhire = 10000 #number of peopled hired per year
+    for year in range(2011,2017):
+        w = phdy_labor_pool<=year
+        index = np.arange(w.sum())
+
+        #Set relative probablities of selecting different candidates
+        prob = np.ones(w.sum())
+        for i in range(10):
+            w_year = phdy_labor_pool[w]==year-i
+            prob[w_year]*=success[i]
+        w_too_old = phdy_labor_pool[w]<=(year-10)
+        prob[w_too_old] = 0
+        wfemale = (labor_pool[w]==1)
+        prob[wfemale]*=bias
+        prob/=prob.sum()
+                
+        select = np.random.choice(index,Nhire,replace=False,p=prob)
+        hired_pool.extend(labor_pool[w][select])
+        phdy_hired_pool.extend(phdy_labor_pool[w][select])
+        hirey_hired_pool.extend(Nhire*[year,])
+
+        #Remove hired candidates from the pool of available candidates
+        index = np.arange(len(labor_pool))
+        labor_pool = np.delete(labor_pool,index[w][select])
+        phdy_labor_pool = np.delete(phdy_labor_pool,index[w][select])
+
+    hired_pool = np.array(hired_pool)
+    phdy_hired_pool=np.array(phdy_hired_pool)
+    hirey_hired_pool=np.array(hirey_hired_pool)
+
+
+    #Plot full distribution
+    bins=np.arange(0,11)-.5
+    #Male distrobution
+    wuse = (phd_year>2001) & (gender==0)
+    plt.rc('axes',lw=3)
+    plt.subplot(121)
+    plt.title('Male',fontweight='bold')
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3)
+    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    ax = plt.gca()
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(20)
+        tick.label1.set_fontweight('bold')
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(18)
+        tick.label1.set_fontweight('bold')
+    
+        
+    wmodel = (phdy_hired_pool>2001) & (hired_pool==0)
+    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=3,histtype='step',normed=1)
+    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=3)
+    plt.legend(('Data','Model'),loc='upper left',fontsize='large',frameon=False)
+    
+    #Female distrobution
+    wuse = (phd_year>2001) & (gender==1)
+    plt.subplot(122)
+    plt.title('Female',fontweight='bold')
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3)
+    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    ax = plt.gca()
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(20)
+        tick.label1.set_fontweight('bold')
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(18)
+        tick.label1.set_fontweight('bold')
+    
+        
+    wmodel = (phdy_hired_pool>2001) & (hired_pool==1)
+    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=3,histtype='step',normed=1)
+    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=3)
+    plt.legend(('Data','Model'),loc='upper left',fontsize='large',frameon=False)
+
+
+    #It is hard to find a bias that substantially changes the distribution for women... A bias of 100 (women are 100x more likely to be hired than men) marginally changes the distribution. Even then it has a tail towards long timescales that is higher than the data...
+    
+
 def gendered_model3(success=[1,1,1,1,1,1,1,1,1,1],tau_male=1.,tau_female=1.):
     '''A test of a gendered model.
        This model removes people from the labor pool at a rate that is proportional to the length of time they have been in the labor pool. The rate can vary between men and women
@@ -536,12 +656,32 @@ def gendered_model3(success=[1,1,1,1,1,1,1,1,1,1],tau_male=1.,tau_female=1.):
     Nadd_female = int(ffrac*30000)
     
     #Populate labor pool. Assume the number of people added per year is constant, and the fraction of women is constant per year
-    for year in range(2000,2017):
+    for year in range(1995,2017):
         phdy_labor_pool_male.extend(Nadd_male*[year,])
         phdy_labor_pool_female.extend(Nadd_female*[year,])
 
     phdy_labor_pool_male = np.array(phdy_labor_pool_male)
     phdy_labor_pool_female = np.array(phdy_labor_pool_female)
+
+    #Initial removal of women from the labor market (sets up distribution for year=2011)
+    for year in range(2005,2011):
+        taper_male = 1-np.exp(-(np.arange(10)-4)/float(tau_male))
+        taper_male[taper_male<0]
+        taper_female = 1-np.exp(-(np.arange(10)-4)/float(tau_female))
+        taper_female[taper_female<0] = 0
+        for i in range(5,10):
+            index = np.arange(len(phdy_labor_pool_male))
+            wmale = phdy_labor_pool_male<=year
+            w_year = phdy_labor_pool_male[wmale]==year-i
+            if w_year.sum()>0:
+                select = np.random.choice(np.arange(w_year.sum()),int(w_year.sum()*taper_male[i]),replace=False)
+                phdy_labor_pool_male = np.delete(phdy_labor_pool_male,index[wmale][w_year][select])
+            index = np.arange(len(phdy_labor_pool_female))
+            wfemale = phdy_labor_pool_female<=year
+            w_year = phdy_labor_pool_female[wfemale]==year-i
+            if w_year.sum()>0:
+                select = np.random.choice(np.arange(w_year.sum()),int(w_year.sum()*taper_female[i]),replace=False)
+                phdy_labor_pool_female = np.delete(phdy_labor_pool_female,index[wfemale][w_year][select])
 
     #Populate hired pool. Start 5 years after beginning of labor pool. Randomly select people from labor pool
     Nhire = 10000 #number of peopled hired per year
@@ -582,9 +722,9 @@ def gendered_model3(success=[1,1,1,1,1,1,1,1,1,1],tau_male=1.,tau_female=1.):
         phdy_labor_pool_female = np.delete(phdy_labor_pool_female,index[wfemale][select_female])
 
         #Remove a fraction of non-hired candidates that have been in the labor pool for longer than 4 years
-        taper_male = 1-np.exp(-(np.arange(10)-4)/float(tau_male))
+        taper_male = 1-np.exp(-(np.arange(15)-4)/float(tau_male))
         taper_male[taper_male<0] = 0 #fraction of non-hired candidates that are removed
-        taper_female = 1-np.exp(-(np.arange(10)-4)/float(tau_female))
+        taper_female = 1-np.exp(-(np.arange(15)-4)/float(tau_female))
         taper_female[taper_female<0] = 0
         for i in range(5,10):
             index = np.arange(len(phdy_labor_pool_male))
@@ -599,6 +739,152 @@ def gendered_model3(success=[1,1,1,1,1,1,1,1,1,1],tau_male=1.,tau_female=1.):
             if w_year.sum()>0:
                 select = np.random.choice(np.arange(w_year.sum()),int(w_year.sum()*taper_female[i]),replace=False)
                 phdy_labor_pool_female = np.delete(phdy_labor_pool_female,index[wfemale][w_year][select])
+            
+        
+    phdy_hired_pool_male=np.array(phdy_hired_pool_male)
+    hirey_hired_pool_male=np.array(hirey_hired_pool_male)
+    phdy_hired_pool_female=np.array(phdy_hired_pool_female)
+    hirey_hired_pool_female=np.array(hirey_hired_pool_female)
+
+    #Plot full distribution
+    bins=np.arange(0,11)-.5
+    #Male distrobution
+    wuse = (phd_year>2001) & (gender==0)
+    plt.rc('axes',lw=3)
+    plt.subplot(121)
+    plt.title('Male',fontweight='bold')
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3)
+    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    ax = plt.gca()
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(20)
+        tick.label1.set_fontweight('bold')
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(18)
+        tick.label1.set_fontweight('bold')
+    
+        
+    wmodel = (phdy_hired_pool_male>2001)
+    p = plt.hist(hirey_hired_pool_male[wmodel]-phdy_hired_pool_male[wmodel],bins,color='r',lw=3,histtype='step',normed=1)
+    plt.axvline(np.mean(hirey_hired_pool_male[wmodel]-phdy_hired_pool_male[wmodel]),color='r',lw=3)
+    plt.legend(('Data','Model'),loc='upper left',fontsize='large',frameon=False)
+    
+    #Female distribution
+    wuse = (phd_year>2001) & (gender==1)
+    plt.subplot(122)
+    plt.title('Female',fontweight='bold')
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3)
+    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    ax = plt.gca()
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(20)
+        tick.label1.set_fontweight('bold')
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(18)
+        tick.label1.set_fontweight('bold')
+    
+        
+    wmodel = (phdy_hired_pool_female>2001)
+    p = plt.hist(hirey_hired_pool_female[wmodel]-phdy_hired_pool_female[wmodel],bins,color='r',lw=3,histtype='step',normed=1)
+    plt.axvline(np.mean(hirey_hired_pool_female[wmodel]-phdy_hired_pool_female[wmodel]),color='r',lw=3)
+    plt.legend(('Data','Model'),loc='upper left',fontsize='large',frameon=False)
+
+    #tau_male=4.,tau_female=3.,success=[.01,.02,.1,.2,.33,.36,.34,.48,1.,1.] does a reasonable job of fitting both distributions. In this case, women leave the labor pool one year faster than men.
+
+
+def gendered_model3b(success=[1,1,1,1,1,1,1,1,1,1],df=0.):
+    '''A test of a gendered model.
+       Similar to gendered_model3, this model removes people from the labor market. This model does it by removing a fixed fraction of women (df) per year. df=.1 removes 10% of female candidates, starting the fifth year on the labor market.
+    '''
+    import numpy as np
+    import matplotlib.pyplot as plt
+    
+    gender,phd_year,hire_year,carnegie_class = load_demo()
+    
+    wnonzero = np.array(success)<0
+    wlarge = np.array(success)>1
+    if wnonzero.sum()>0 or wlarge.sum()>0:
+        return -np.inf
+
+    phdy_labor_pool_male = []
+    phdy_labor_pool_female = []
+
+    phdy_hired_pool_male = []
+    hirey_hired_pool_male = []
+    phdy_hired_pool_female = []
+    hirey_hired_pool_female = []
+
+    
+    mfrac = .7
+    ffrac = 1-mfrac
+
+    Nadd_male = int(mfrac*30000) #number of people added to the labor pool, per year
+    Nadd_female = int(ffrac*30000)
+    
+    #Populate labor pool. Assume the number of people added per year is constant, and the fraction of women is constant per year
+    for year in range(1995,2017):
+        phdy_labor_pool_male.extend(Nadd_male*[year,])
+        phdy_labor_pool_female.extend(Nadd_female*[year,])
+
+    phdy_labor_pool_male = np.array(phdy_labor_pool_male)
+    phdy_labor_pool_female = np.array(phdy_labor_pool_female)
+
+    #Initial removal of women from the labor market (sets up the distribution for year=2011).
+    for year in range(2005,2011):
+        wyear = phdy_labor_pool_female<=(year-5)
+        index = np.arange(wyear.sum())
+        if int(df*Nadd_female)>0:
+            select = np.random.choice(index,int(df*Nadd_female),replace=False)
+            phdy_labor_pool_female = np.delete(phdy_labor_pool_female,index[select])
+        
+
+    #Populate hired pool. Start 5 years after beginning of labor pool. Randomly select people from labor pool
+    Nhire = 10000 #number of peopled hired per year
+    for year in range(2011,2017):
+        wmale = phdy_labor_pool_male<=year
+        index_male = np.arange(wmale.sum())
+        wfemale = phdy_labor_pool_female<=year
+        index_female = np.arange(wfemale.sum())
+
+        #Set relative probablities of selecting different candidates
+        prob_male = np.ones(wmale.sum())
+        prob_female = np.ones(wfemale.sum())
+        for i in range(10):
+            w_year = phdy_labor_pool_male[wmale]==year-i
+            if w_year.sum()>0:
+                prob_male[w_year]*=success[i]
+            w_year = phdy_labor_pool_female[wfemale]==year-i
+            if w_year.sum()>0:
+                prob_female[w_year]*=success[i]
+        w_too_old = phdy_labor_pool_male[wmale]<=(year-10)
+        prob_male[w_too_old] = 0
+        prob_male/=prob_male.sum()
+        w_too_old = phdy_labor_pool_female[wfemale]<=(year-10)
+        prob_female[w_too_old] = 0
+        prob_female/=prob_female.sum()
+        
+        select_male = np.random.choice(index_male,Nhire,replace=False,p=prob_male)
+        select_female = np.random.choice(index_female,Nhire,replace=False,p=prob_female)
+        phdy_hired_pool_male.extend(phdy_labor_pool_male[wmale][select_male])
+        hirey_hired_pool_male.extend(Nhire*[year,])
+        phdy_hired_pool_female.extend(phdy_labor_pool_female[wfemale][select_female])
+        hirey_hired_pool_female.extend(Nhire*[year,])
+        
+        #Remove hired candidates from the pool of available candidates
+        index = np.arange(len(phdy_labor_pool_male))
+        phdy_labor_pool_male = np.delete(phdy_labor_pool_male,index[wmale][select_male])
+        index = np.arange(len(phdy_labor_pool_female))
+        phdy_labor_pool_female = np.delete(phdy_labor_pool_female,index[wfemale][select_female])
+
+        #Removal a fraction of women that have been in the labor pool longer than five years
+        wyear = phdy_labor_pool_female<=(year-5)
+        index = np.arange(wyear.sum())
+        if int(df*Nadd_female)>0:
+            select = np.random.choice(index,int(df*Nadd_female),replace=False)
+            phdy_labor_pool_female = np.delete(phdy_labor_pool_female,index[select])
+
             
         
     phdy_hired_pool_male=np.array(phdy_hired_pool_male)
@@ -651,5 +937,4 @@ def gendered_model3(success=[1,1,1,1,1,1,1,1,1,1],tau_male=1.,tau_female=1.):
     plt.axvline(np.mean(hirey_hired_pool_female[wmodel]-phdy_hired_pool_female[wmodel]),color='r',lw=3)
     plt.legend(('Data','Model'),loc='upper left',fontsize='large',frameon=False)
 
-    #tau_male=5.,tau_female=2.,success=[.01,.04,.15,.3,.47,.53,.44,.5,.6,.2] does a reasonable job of fitting both distributions. In this case, women leave the labor pool in half of the time as men do...
-    #tau_male=2.,tau_female=1.,success=[.01,.04,.11,.23,.4,.4,.48,.8,1.,.8] also does a reasonable job of fitting both distributions (although the high-timescale end for the women isn't perfect). Again, the timescale for women to leave the labor pool is half as long as it is for men.
+    #success=[.02,.04,.18,.35,.55,.64,.44,.33,.31,.12] with df=.8 fits some of the distribution, but is way too high of a df value...
