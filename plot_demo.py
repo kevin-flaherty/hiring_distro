@@ -289,7 +289,7 @@ def gendered_model1(success=[1,1,1,1,1,1,1,1,1,1],slope=.01):
     hirey_hired_pool = []
 
     
-    mfrac = .7-slope*np.arange(17)
+    mfrac = .74-slope*np.arange(17)
     ffrac = 1-mfrac
     if (mfrac<0).sum()>0:
         print 'Fraction of men becomes negative. Choose a shallower slope.'
@@ -400,7 +400,7 @@ def gendered_model1(success=[1,1,1,1,1,1,1,1,1,1],slope=.01):
 
 
 
-def gendered_model2(success=[1,1,1,1,1,1,1,1,1,1],bias=1.):
+def gendered_model2(success=[1,1,1,1,1,1,1,1,1,1],bias=1.,Nhire=10000):
     '''A test of a gendered model.
        This model includes a bias towards hiring women. Here the bias is an increase if the relative probability of hiring a women compared to hiring a man
     '''
@@ -442,7 +442,10 @@ def gendered_model2(success=[1,1,1,1,1,1,1,1,1,1],bias=1.):
     print '%Female 2003 grad students (30pm2%): {:0.2f}'.format(float(wfemale_grad.sum())/(wmale_grad.sum()+wfemale_grad.sum()))
 
     #Populate hired pool. Start 5 years after beginning of labor pool. Randomly select people from labor pool
-    Nhire = 10000 #number of peopled hired per year
+    #Nhire = 10000 #number of peopled hired per year
+    if Nhire>Nadd:
+        print 'Hiring more professors than PhDs being produced. Setting Nhire=.3*Nadd'
+        Nhire = np.round(.3*Nadd)
     for year in range(2011,2017):
         w = phdy_labor_pool<=year
         index = np.arange(w.sum())
