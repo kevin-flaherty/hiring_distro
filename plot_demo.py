@@ -152,7 +152,7 @@ def basic_model(success=[1,1,1,1,1,1,1,1,1,1],plot_model=True,male_only=False,fe
     Nadd = 50000 #number of people added to the labor pool, per year
 
     #Populate labor pool. Assume the number of people added per year is constant, and the fraction of women is constant per year
-    for year in range(2000,2017):
+    for year in range(2000,2018):
         labor_pool.extend(int(mfrac*Nadd)*[0,])
         labor_pool.extend(int(ffrac*Nadd)*[1,])
         phdy_labor_pool.extend((int(mfrac*Nadd)+int(ffrac*Nadd))*[year,])
@@ -163,7 +163,7 @@ def basic_model(success=[1,1,1,1,1,1,1,1,1,1],plot_model=True,male_only=False,fe
 
     #Populate hired pool. Start 5 years after beginning of labor pool. Randomly select people from labor pool
     Nhire = 30000 #number of peopled hired per year
-    for year in range(2011,2017):
+    for year in range(2011,2018):
         w = phdy_labor_pool<=year
         index = np.arange(w.sum())
 
@@ -298,7 +298,7 @@ def gendered_model1(success=[1,1,1,1,1,1,1,1,1,1],slope=.01):
     Nadd = 30000 #number of people added to the labor pool, per year
 
     #Populate labor pool. Assume the number of people added per year is constant, and the fraction of women is constant per year
-    for year in range(2000,2017):
+    for year in range(2000,2018):
         labor_pool.extend(int(mfrac[year-2000]*Nadd)*[0,])
         labor_pool.extend(int(ffrac[year-2000]*Nadd)*[1,])
         phdy_labor_pool.extend((int(mfrac[year-2000]*Nadd)+int(ffrac[year-2000]*Nadd))*[year,])
@@ -428,7 +428,7 @@ def gendered_model2(success=[1,1,1,1,1,1,1,1,1,1],bias=1.,Nhire=10000):
     Nadd = 30000 #number of people added to the labor pool, per year
 
     #Populate labor pool. Assume the number of people added per year is constant, and the fraction of women is constant per year
-    for year in range(2000,2017):
+    for year in range(2000,2018):
         labor_pool.extend(int(mfrac*Nadd)*[0,])
         labor_pool.extend(int(ffrac*Nadd)*[1,])
         phdy_labor_pool.extend((int(mfrac*Nadd)+int(ffrac*Nadd))*[year,])
@@ -564,7 +564,7 @@ def gendered_model3(success=[1,1,1,1,1,1,1,1,1,1],tau_male=1.,tau_female=1.):
     Nadd_female = int(ffrac*30000)
     
     #Populate labor pool. Assume the number of people added per year is constant, and the fraction of women is constant per year
-    for year in range(1995,2017):
+    for year in range(1995,2018):
         labor_pool.extend(Nadd_male*[0,])
         labor_pool.extend(Nadd_female*[1,])
         phdy_labor_pool.extend(Nadd_male*[year,])
@@ -603,7 +603,7 @@ def gendered_model3(success=[1,1,1,1,1,1,1,1,1,1],tau_male=1.,tau_female=1.):
                 
     #Populate hired pool. Randomly select people from labor pool
     Nhire = 10000 #number of peopled hired per year
-    for year in range(2011,2017):
+    for year in range(2011,2018):
         w = phdy_labor_pool<=year
         index = np.arange(w.sum())
 
@@ -738,7 +738,7 @@ def gendered_model3b(success=[1,1,1,1,1,1,1,1,1,1],df=0.):
     Nadd_female = int(ffrac*30000)
     
     #Populate labor pool. Assume the number of people added per year is constant, and the fraction of women is constant per year
-    for year in range(1995,2017):
+    for year in range(1995,2018):
         phdy_labor_pool_male.extend(Nadd_male*[year,])
         phdy_labor_pool_female.extend(Nadd_female*[year,])
 
@@ -939,7 +939,7 @@ def gendered_model4(success=[1,1,1,1,1,1,1,1,1,1],fstar=.1,df=0.):
     Nadd_female = int(ffrac*30000)
 
     #Populate labor pool. Assume the number of people added per year is constant, and the fraction of women is constant per year
-    for year in range(1995,2017):
+    for year in range(1995,2018):
         labor_pool.extend(Nadd_male*[0,])
         labor_pool.extend(Nadd_female*[1,])
         phdy_labor_pool.extend(Nadd_male*[year,])
@@ -962,7 +962,7 @@ def gendered_model4(success=[1,1,1,1,1,1,1,1,1,1],fstar=.1,df=0.):
 
     #Populate hired pool. Randomly select people from labor pool
     Nhire = 10000 #number of peopled hired per year
-    for year in range(2011,2017):
+    for year in range(2011,2018):
         w = phdy_labor_pool<=year
         index = np.arange(w.sum())
 
