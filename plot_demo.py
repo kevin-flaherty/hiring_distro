@@ -54,10 +54,10 @@ def plot_demo(file='misc.csv',full=False):
     wfnr1 = (gender == 1) & (carnegie_class ==1) & (phd_year > 2000)
     wuse = phd_year>2000
 
-    #print 'Men: ',wmale.sum() #137
-    #print 'Women: ',wfemale.sum() #78
-    #print 'R1: ',wmr1.sum(),wfr1.sum() #106, 52
-    #print 'Not R1: ',wmnr1.sum(),wfnr1.sum() #31, 26
+    #print 'Men: ',wmale.sum() #157
+    #print 'Women: ',wfemale.sum() #88
+    #print 'R1: ',wmr1.sum(),wfr1.sum() #124, 58
+    #print 'Not R1: ',wmnr1.sum(),wfnr1.sum() #33, 30
 
     bins=np.arange(0,11)-.5
     if full:
@@ -83,10 +83,10 @@ def plot_demo(file='misc.csv',full=False):
         plt.rc('axes',lw=3)
         p=plt.hist(hire_year[wmale]-phd_year[wmale],bins,color='k',lw=3,histtype='step')
         plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='ok',capthick=0.,elinewidth=3)
-        plt.axvline(np.mean(hire_year[wmale]-phd_year[wmale]),color='k',lw=3)
+        plt.axvline(np.mean(hire_year[wmale]-phd_year[wmale]),color='k',lw=3,ls=':')
         p=plt.hist(hire_year[wfemale]-phd_year[wfemale],bins,color='r',lw=3,histtype='step')
         plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='or',capthick=0.,elinewidth=3)
-        plt.axvline(np.mean(hire_year[wfemale]-phd_year[wfemale]),color='r',lw=3)
+        plt.axvline(np.mean(hire_year[wfemale]-phd_year[wfemale]),color='r',lw=3,ls=':')
         plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
         ax = plt.gca()
         for tick in ax.xaxis.get_major_ticks():
@@ -864,3 +864,187 @@ def gendered_model3b(success=[1,1,1,1,1,1,1,1,1,1],df=0.):
 
     #Hughes et al. demographics: 23% of grad students in 1992 were women, while only 15% of assistant professors were women in 2003. 30% of men advanced, compared to 18% of women.
     #30% of grad students in 2003 are women, while only 26% of assistant professors in 2013 are women. 19% of men advance, and only 16% of women advance. 
+
+
+def plot_df(tau_male=1.,tau_female=1.):
+    '''Plot the taper on the labor market used in gendered_model3a. Used to show the relative rate at which men/women leave the labor market.'''
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    year_start = 2
+    
+    taper_male = 1-np.exp(-(np.arange(15)-year_start)/float(tau_male))
+    taper_male[taper_male<0] = 0
+    taper_female = 1-np.exp(-(np.arange(15)-year_start)/float(tau_female))
+    taper_female[taper_female<0] = 0
+
+    plt.rc('axes',lw=3)
+    plt.subplot(211)
+    plt.plot(np.arange(15),taper_male,color='k',lw=3)
+    plt.plot(np.arange(15),taper_female,color='r',lw=3)
+    #plt.xlabel('Time since PhD (years)',fontweight='bold',fontsize=18)
+    plt.ylabel('Fraction of PhDs \nleaving the labor market',fontweight='bold',fontsize=18)
+    plt.legend(('Male','Female'),frameon=False,loc='upper left',fontsize='large')
+    plt.xlim(0,14)
+    ax = plt.gca()
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(20)
+        tick.label1.set_fontweight('bold')
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(18)
+        tick.label1.set_fontweight('bold')
+
+    plt.subplot(212)
+    plt.plot(np.arange(15),taper_female/taper_male,color='k',lw=3)
+    plt.ylabel('F(female)/F(male)',fontweight='bold',fontsize=18)
+    plt.xlabel('Time since PhD (years)',fontweight='bold',fontsize=18)
+    plt.xlim(0,14)
+    ax = plt.gca()
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(20)
+        tick.label1.set_fontweight('bold')
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(18)
+        tick.label1.set_fontweight('bold')
+
+
+def gendered_model4(success=[1,1,1,1,1,1,1,1,1,1],fstar=.1,df=0.):
+    '''A test of a gendered model.
+    This model posits that a subset of the market consists of super-stars that are quickly hired into faculty positions. This leaves, at later times, a field dominated by non-stars. Female non-stars have a lower probability of being hired than male non-stars (due to e.g. unconcious bias). The turnover in the female distribution is due to the female superstars being quickly removed from the labor market, leaving behind the non-stars, who face a much tougher labor market than equivalent men. fstar=fraction of labor market that are super-stars. df=relative depression in hiring probability for women compared to men (df>0 means that non-star women are hired at a lower rate than men)'''
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+
+    gender,phd_year,hire_year,carnegie_class = load_demo()
+
+    wnonzero = np.array(success)<0
+    wlarge = np.array(success)>1
+    if wnonzero.sum()>0 or wlarge.sum()>0:
+        return -np.inf
+
+
+    labor_pool = []
+    phdy_labor_pool = []
+
+    hired_pool = []
+    phdy_hired_pool = []
+    hirey_hired_pool = []
+
+    
+    mfrac = .7
+    ffrac = 1-mfrac
+
+    Nadd_male = int(mfrac*30000) #number of people added to the labor pool, per year
+    Nadd_female = int(ffrac*30000)
+
+    #Populate labor pool. Assume the number of people added per year is constant, and the fraction of women is constant per year
+    for year in range(1995,2017):
+        labor_pool.extend(Nadd_male*[0,])
+        labor_pool.extend(Nadd_female*[1,])
+        phdy_labor_pool.extend(Nadd_male*[year,])
+        phdy_labor_pool.extend(Nadd_female*[year,])
+
+    labor_pool = np.array(labor_pool)
+    phdy_labor_pool = np.array(phdy_labor_pool)
+
+    #Set a fraction of the labor market to be super-stars
+    nstar = int(fstar*len(labor_pool))
+    select = np.random.choice(np.arange(len(labor_pool)),nstar,replace=False)
+    superstar = np.zeros(len(labor_pool))
+    superstar[select] = 1
+
+    #2003 grad student demographics
+    wmale_grad = (phdy_labor_pool >=2003) & (phdy_labor_pool <=2010) & (labor_pool==0)
+    wfemale_grad = (phdy_labor_pool>=2003) & (phdy_labor_pool<=2010) & (labor_pool==1)
+    print '%Female 2003 grad students (30pm2%): {:0.2f}'.format(float(wfemale_grad.sum())/(wmale_grad.sum()+wfemale_grad.sum()))
+
+
+    #Populate hired pool. Randomly select people from labor pool
+    Nhire = 10000 #number of peopled hired per year
+    for year in range(2011,2017):
+        w = phdy_labor_pool<=year
+        index = np.arange(w.sum())
+
+        #Set relative probablities of selecting different candidates
+        prob = np.ones(w.sum())
+        for i in range(10):
+            w_year = phdy_labor_pool[w]==year-i
+            if w_year.sum()>0:
+                prob[w_year]*=success[i]
+        w_too_old = phdy_labor_pool[w]<=(year-10)
+        prob[w_too_old] = 0
+        prob[superstar[w]==1]*=100
+        wfn = (labor_pool[w]==1) & (superstar[w]==0)
+        prob[w][wfn]-=df
+        prob[prob<0]=0.
+        prob/=prob.sum()
+        
+        select = np.random.choice(index,Nhire,replace=False,p=prob)
+        hired_pool.extend(labor_pool[w][select])
+        phdy_hired_pool.extend(phdy_labor_pool[w][select])
+        hirey_hired_pool.extend(Nhire*[year,])
+               
+        #Remove hired candidates from the pool of available candidates
+        index = np.arange(len(phdy_labor_pool))
+        phdy_labor_pool = np.delete(phdy_labor_pool,index[w][select])
+        labor_pool = np.delete(labor_pool,index[w][select])
+        superstar = np.delete(superstar,index[w][select])
+
+    phdy_hired_pool=np.array(phdy_hired_pool)
+    hirey_hired_pool=np.array(hirey_hired_pool)
+    hired_pool = np.array(hired_pool)
+
+
+    #Demographics to compare to Hughes et al. survey. This is the percentage of female grad students in 2003 (include anyone getting a phd in 2003-2010) and percentage of female assistant professors in 2013 (anyone hired from 2007-2013)
+    #Hughes et al values: 30% grad students in 2003, 26% assistant professors in 2013
+    wmale_prof = (hirey_hired_pool>=2007) & (hirey_hired_pool<=2013) & (hired_pool==0)
+    wfemale_prof = (hirey_hired_pool>=2007) & (hirey_hired_pool<=2013) & (hired_pool==1)
+    print '%Female Assistant Prof 2013 (26pm4%): {:0.2f}'.format(float(wfemale_prof.sum())/(wmale_prof.sum()+wfemale_prof.sum()))    
+    #Plot full distribution
+    bins=np.arange(0,11)-.5
+    #Male distrobution
+    wuse = (phd_year>2001) & (gender==0)
+    plt.rc('axes',lw=3)
+    plt.subplot(211)
+    plt.title('Male',fontweight='bold')
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1,label=None)
+    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=3,label=None)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3,label='Data')
+    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    ax = plt.gca()
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(20)
+        tick.label1.set_fontweight('bold')
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(18)
+        tick.label1.set_fontweight('bold')
+    
+        
+    wmodel = (phdy_hired_pool>2001) & (hired_pool==0)
+    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=3,histtype='step',normed=1,label=None)
+    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=3,label='Model')
+    plt.legend(loc='upper left',fontsize='large',frameon=False)
+    
+    #Female distribution
+    wuse = (phd_year>2001) & (gender==1)
+    plt.subplot(212)
+    plt.title('Female',fontweight='bold')
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1)
+    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=3)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3)
+    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    ax = plt.gca()
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(20)
+        tick.label1.set_fontweight('bold')
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(18)
+        tick.label1.set_fontweight('bold')
+    
+        
+    wmodel = (phdy_hired_pool>2001) & (hired_pool==1)
+    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=3,histtype='step',normed=1)
+    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=3)
+    
+#This model doesn't seem to work... success=[.005,.01,.04,.1,.25,.56,.48,.37,.31,.08] with fstar=.15,df=1. at least fits the male distribution, but doesn't have much of an effect on the female distribution...
