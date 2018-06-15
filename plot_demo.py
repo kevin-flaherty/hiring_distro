@@ -1893,3 +1893,23 @@ def plot_exp_demo(tau=10):
         tick.label1.set_fontsize(12)
     for tick in ax.yaxis.get_major_ticks():
         tick.label1.set_fontsize(12)
+
+
+
+def plot_nphds():
+    '''Using statistics collected by AIP (https://www.aip.org/statistics/rosters/astronomy), plot the number of PhDs awarded in astronomy for each year.'''
+
+    import matplotlib.pyplot as plt
+
+    year = [1992,1994,1995,1996,1997,1998,1999,2000,2001,2002,2003,2004,2005,2006,2007,2008,2009,2010,2011,2012,2013,2014,2015,2016]
+    n = [93,117,133,126,111,116,88,139,101,102,88,116,93,119,125,161,141,156,160,152,155,147,130,170]
+
+    plt.plot(year,n,'ok',ls='-')
+    plt.xlabel('Year',fontsize=14)
+    plt.ylabel('N(PhDs)',fontsize=14)
+    plt.xticks(rotation=45)
+    ax = plt.gca()
+    for tick in ax.xaxis.get_major_ticks():
+        tick.label1.set_fontsize(12)
+    for tick in ax.yaxis.get_major_ticks():
+        tick.label1.set_fontsize(12)
