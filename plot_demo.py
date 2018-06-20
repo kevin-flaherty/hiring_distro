@@ -1,3 +1,5 @@
+# - calculate the fraction of people that receive a PhD in a given year that eventually get a faculty job. Does it match the survival statistics?
+
 def load_demo(file='misc.csv'):
     '''Load in the hiring information into appropriate variables'''
     import csv
@@ -64,42 +66,38 @@ def plot_demo(file='misc.csv',full=False):
     bins=np.arange(0,11)-.5
     if full:
         #Plot full distribution
-        plt.rc('axes',lw=3)
+        plt.rc('axes',lw=2)
         p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step')
         plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='ok',capthick=0.,elinewidth=3)
         plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',ls='--',lw=3)
-        plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=24)
-        plt.ylabel('N',fontweight='bold',fontsize=24)
+        plt.xlabel('Time to hiring (years)',fontsize=20)
+        plt.ylabel('N',fontsize=24)
         ax = plt.gca()
         for tick in ax.xaxis.get_major_ticks():
-            tick.label1.set_fontsize(18)
-            tick.label1.set_fontweight('bold')
+            tick.label1.set_fontsize(16)
         for tick in ax.yaxis.get_major_ticks():
-            tick.label1.set_fontsize(18)
-            tick.label1.set_fontweight('bold')
+            tick.label1.set_fontsize(16)
         
         print ' '
         print 'Mean time to hiring: {:0.2f}+-{:0.2f}'.format(np.mean(hire_year[wuse]-phd_year[wuse]),np.mean(hire_year[wuse]-phd_year[wuse])/np.sqrt(wuse.sum()))
         #print 'Total sample size: {:0.0f}'.format(wuse.sum())#215
     else:
         #Plot distribution according to gender
-        plt.rc('axes',lw=3)
+        plt.rc('axes',lw=2)
         p=plt.hist(hire_year[wmale]-phd_year[wmale],bins,color='k',lw=3,histtype='step')
         plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='ok',capthick=0.,elinewidth=3)
         plt.axvline(np.mean(hire_year[wmale]-phd_year[wmale]),color='k',lw=3,ls=':')
         p=plt.hist(hire_year[wfemale]-phd_year[wfemale],bins,color='r',lw=3,histtype='step')
         plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='or',capthick=0.,elinewidth=3)
         plt.axvline(np.mean(hire_year[wfemale]-phd_year[wfemale]),color='r',lw=3,ls=':')
-        plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
-        plt.ylabel('N',fontweight='bold',fontsize=18)
+        plt.xlabel('Time to hiring (years)',fontsize=20)
+        plt.ylabel('N',fontsize=20)
         ax = plt.gca()
         for tick in ax.xaxis.get_major_ticks():
-            tick.label1.set_fontsize(20)
-            tick.label1.set_fontweight('bold')
+            tick.label1.set_fontsize(16)
         for tick in ax.yaxis.get_major_ticks():
-            tick.label1.set_fontsize(18)
-            tick.label1.set_fontweight('bold')
-        plt.legend(('Male','Female'),loc='upper left',fontsize='large',frameon=False)
+            tick.label1.set_fontsize(16)
+        plt.legend(('Male','Female'),loc='upper left',fontsize=16,frameon=False)
 
         #print 'Sample size (Male,Female): ',wmale.sum(),wfemale.sum()#137,78
         print ' '
@@ -121,6 +119,88 @@ def plot_demo(file='misc.csv',full=False):
         #print 'Prob: ',p
 
 
+def plot_demo_split(file='misc.csv',full=False):
+    '''Similar to plot_demo, but it plots the hiring time distribution in two year bins to look for any dramatic changes with time.'''
+
+    import numpy as np
+    import matplotlib.pyplot as plt
+    from scipy.stats import ks_2samp
+    #2011,2012; 2013,2014; 2015,2016; 2017
+    gender,phd_year,hire_year,carnegie_class = load_demo(file)
+    bins = np.arange(0,11)-.5
+    
+    if full:
+        for year in np.arange(2011,2018,2):
+            wuse = (phd_year>2000) & (hire_year>=year) & (hire_year <= year+1)
+            plt.subplot(4,1,(year-2011)/2+1)
+            p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,lw=2,histtype='step',color='k')
+            plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='ok',capthick=0.,elinewidth=2)
+            plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',ls='--',lw=3)
+            print 'Median time to hiring for {:0.0f}-{:0.0f}: {:0.2f} +- {:0.2f}'.format(year,year+1,np.mean(hire_year[wuse]-phd_year[wuse]),np.mean(hire_year[wuse]-phd_year[wuse])/np.sqrt(wuse.sum()))
+            plt.title('{:0.0f} - {:0.0f}'.format(year,year+1),fontsize=16)
+            ax = plt.gca()
+            for tick in ax.xaxis.get_major_ticks():
+                tick.label1.set_fontsize(14)
+            for tick in ax.yaxis.get_major_ticks():
+                tick.label1.set_fontsize(14)
+        plt.xlabel('Time to hiring (years)',fontsize=18)
+        plt.ylabel('N',fontsize=18)
+    else:
+        #look at 2011-2013 and 2014-2017
+        wmale = (phd_year>2000) & (hire_year>=2011) & (hire_year<=2013) & (gender==0)
+        wfemale = (phd_year>2000) & (hire_year>=2011) & (hire_year<=2013) & (gender==1)
+        plt.subplot(121)
+        p=plt.hist(hire_year[wmale]-phd_year[wmale],bins,color='k',lw=2,histtype='step')
+        plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='ok',capthick=0.,elinewidth=2)
+        plt.axvline(np.mean(hire_year[wmale]-phd_year[wmale]),color='k',lw=2,ls=':')
+        p=plt.hist(hire_year[wfemale]-phd_year[wfemale],bins,color='r',lw=2,histtype='step')
+        plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='or',capthick=0.,elinewidth=2)
+        plt.axvline(np.mean(hire_year[wfemale]-phd_year[wfemale]),color='r',lw=2,ls=':')
+        plt.xlabel('Time to hiring (years)',fontsize=16)
+        plt.ylabel('N',fontsize=16)
+        plt.title('2011-2013',fontsize=16)
+        ax = plt.gca()
+        for tick in ax.xaxis.get_major_ticks():
+            tick.label1.set_fontsize(14)
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label1.set_fontsize(14)
+        plt.legend(('Male','Female'),loc='upper left',fontsize='large',frameon=False)
+
+        #print 'Sample size (Male,Female): ',wmale.sum(),wfemale.sum()#76,38, 33+-5% female
+        print ' '
+        print 'Time to faculty, Men: {:0.2f}+-{:0.2f}'.format(np.mean(hire_year[wmale]-phd_year[wmale]),np.mean(hire_year[wmale]-phd_year[wmale])/np.sqrt(wmale.sum()))
+        print 'Time to faculty, Female: {:0.2f}+-{:0.2f} '.format(np.mean(hire_year[wfemale]-phd_year[wfemale]),np.mean(hire_year[wfemale]-phd_year[wfemale])/np.sqrt(wfemale.sum()))
+        d,p = ks_2samp(hire_year[wmale]-phd_year[wmale],hire_year[wfemale]-phd_year[wfemale])
+        print 'Prob: {:0.3f}'.format(p)
+        
+        wmale = (phd_year>2000) & (hire_year>=2014) & (hire_year<=2017) & (gender==0)
+        wfemale = (phd_year>2000) & (hire_year>=2014) & (hire_year<=2017) & (gender==1)
+        plt.subplot(122)
+        p=plt.hist(hire_year[wmale]-phd_year[wmale],bins,color='k',lw=2,histtype='step')
+        plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='ok',capthick=0.,elinewidth=2)
+        plt.axvline(np.mean(hire_year[wmale]-phd_year[wmale]),color='k',lw=2,ls=':')
+        p=plt.hist(hire_year[wfemale]-phd_year[wfemale],bins,color='r',lw=2,histtype='step')
+        plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='or',capthick=0.,elinewidth=2)
+        plt.axvline(np.mean(hire_year[wfemale]-phd_year[wfemale]),color='r',lw=2,ls=':')
+        plt.xlabel('Time to hiring (years)',fontsize=16)
+        plt.ylabel('N',fontsize=16)
+        plt.title('2014-2017',fontsize=16)
+        ax = plt.gca()
+        for tick in ax.xaxis.get_major_ticks():
+            tick.label1.set_fontsize(14)
+        for tick in ax.yaxis.get_major_ticks():
+            tick.label1.set_fontsize(14)
+        plt.legend(('Male','Female'),loc='upper left',fontsize='large',frameon=False)
+
+        #print 'Sample size (Male,Female): ',wmale.sum(),wfemale.sum()#81,50, 38+-5% female
+        print ' '
+        print 'Time to faculty, Men: {:0.2f}+-{:0.2f}'.format(np.mean(hire_year[wmale]-phd_year[wmale]),np.mean(hire_year[wmale]-phd_year[wmale])/np.sqrt(wmale.sum()))
+        print 'Time to faculty, Female: {:0.2f}+-{:0.2f} '.format(np.mean(hire_year[wfemale]-phd_year[wfemale]),np.mean(hire_year[wfemale]-phd_year[wfemale])/np.sqrt(wfemale.sum()))
+        d,p = ks_2samp(hire_year[wmale]-phd_year[wmale],hire_year[wfemale]-phd_year[wfemale])
+        print 'Prob: {:0.3f}'.format(p)
+
+        # No substantial change in the hiring time distribution over the 7 years covered in this study. 
+        
 def plot_cc(file='misc.csv',full=True):
     '''Plot the hiring distribution, separated based on carnegire classification (R1 vs non-R1)'''
     import numpy as np
@@ -143,24 +223,22 @@ def plot_cc(file='misc.csv',full=True):
     bins = np.arange(0,11)-.5
     if full:
         #plot R1 vs non-R1, regardless of gender
-        plt.rc('axes',lw=3)
-        p=plt.hist(hire_year[wr1]-phd_year[wr1],bins,color='k',lw=3,histtype='step')
-        plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='ok',capthick=0,elinewidth=3)
-        plt.axvline(np.mean(hire_year[wr1]-phd_year[wr1]),color='k',lw=3,ls=':')
+        plt.rc('axes',lw=2)
+        p=plt.hist(hire_year[wr1]-phd_year[wr1],bins,color='k',lw=2,histtype='step')
+        plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='ok',capthick=0,elinewidth=2)
+        plt.axvline(np.mean(hire_year[wr1]-phd_year[wr1]),color='k',lw=2,ls=':')
 
-        p=plt.hist(hire_year[wnr1]-phd_year[wnr1],bins,color='r',lw=3,histtype='step')
-        plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='or',capthick=0,elinewidth=3)
-        plt.axvline(np.mean(hire_year[wnr1]-phd_year[wnr1]),color='r',lw=3,ls=':')
-        plt.ylabel('N',fontweight='bold',fontsize=18)
-        plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+        p=plt.hist(hire_year[wnr1]-phd_year[wnr1],bins,color='r',lw=2,histtype='step')
+        plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]),fmt='or',capthick=0,elinewidth=2)
+        plt.axvline(np.mean(hire_year[wnr1]-phd_year[wnr1]),color='r',lw=2,ls=':')
+        plt.ylabel('N',fontsize=20)
+        plt.xlabel('Time to hiring (years)',fontsize=20)
         ax = plt.gca()
         for tick in ax.xaxis.get_major_ticks():
-            tick.label1.set_fontsize(20)
-            tick.label1.set_fontweight('bold')
+            tick.label1.set_fontsize(16)
         for tick in ax.yaxis.get_major_ticks():
-            tick.label1.set_fontsize(18)
-            tick.label1.set_fontweight('bold')
-        plt.legend(('R1','non-R1'),loc='upper left',fontsize='large',frameon=False)
+            tick.label1.set_fontsize(16)
+        plt.legend(('R1','non-R1'),loc='upper left',fontsize=14,frameon=False)
 
         print ' '
         print 'Time to faculty, R1: {:0.2f}+-{:0.2f}'.format(np.mean(hire_year[wr1]-phd_year[wr1]),np.mean(hire_year[wr1]-phd_year[wr1])/np.sqrt(wr1.sum()))
@@ -267,7 +345,6 @@ def basic_model(success=[1,1,1,1,1,1,1,1,1,1],plot_model=True,male_only=False,fe
     labor_pool = np.array(labor_pool)
     phdy_labor_pool = np.array(phdy_labor_pool)
     
-
     #Populate hired pool. Start 5 years after beginning of labor pool. Randomly select people from labor pool
     Nhire = 30000 #number of peopled hired per year
     for year in range(1990,2018):
@@ -326,6 +403,10 @@ def basic_model(success=[1,1,1,1,1,1,1,1,1,1],plot_model=True,male_only=False,fe
     
         print ' '
         print 'Mean time to hiring (model): {:0.2f}'.format(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]))
+
+        #What fraction of astronomers that got a PhD in 2003 were hired?
+        #print (phdy_hired_pool==2003).sum() 29932, which is ~60% of all people that got a PhD in 2003. This is much higher than the 15% that is measured by Hughes et al. ...
+        
 
     else:
         bins=np.arange(0,11)-.5
@@ -403,22 +484,20 @@ def plot_female_increase(slope=.1,year0=2000):
         ffrac_grad.append(float(wfemale_grad.sum())/(wmale_grad.sum()+wfemale_grad.sum()))
     ffrac_grad = np.array(ffrac_grad)
     
-    plt.rc('axes',lw=3)
-    plt.plot(years,1-ffrac_grad,color='k',lw=3)
-    plt.plot(years,ffrac_grad,color='r',lw=3,ls='--')
+    plt.rc('axes',lw=2)
+    plt.plot(years,1-ffrac_grad,color='k',lw=2)
+    plt.plot(years,ffrac_grad,color='r',lw=2,ls='--')
     plt.legend(('Male','Female'),frameon=False,fontsize=16,loc='best')
-    plt.xlabel('PhD Year',fontweight='bold',fontsize=24)
-    plt.ylabel('Fraction (male,female)',fontweight='bold',fontsize=24)
+    plt.xlabel('PhD Year',fontsize=20)
+    plt.ylabel('Fraction (male,female)',fontsize=20)
     plt.errorbar([1992,1999,2003,2013],[.22,.26,.30,.34],yerr=[.02,.02,.02,.02],fmt='or')
     plt.xlim(1980,2020)
     plt.xticks(rotation=45)
     ax = plt.gca()
     for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_fontsize(18)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_fontsize(18)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
 
         
 def gendered_model1(success=[1,1,1,1,1,1,1,1,1,1],slope=.01,year0=2000):
@@ -510,49 +589,45 @@ def gendered_model1(success=[1,1,1,1,1,1,1,1,1,1],slope=.01,year0=2000):
     bins=np.arange(0,11)-.5
     #Male distrobution
     wuse = (phd_year>2001) & (gender==0)
-    plt.rc('axes',lw=3)
+    plt.rc('axes',lw=2)
     plt.subplot(211)
-    plt.title('Male',fontweight='bold')
-    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1,label=None)
-    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=3,label=None)
-    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3,label='Data')
-    plt.ylabel('f',fontweight='bold',fontsize=18)
-    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    plt.title('Male',fontsize=16)
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=2,histtype='step',normed=1,label=None)
+    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=2,label=None)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=2,label='Data')
+    plt.ylabel('f',fontsize=18)
+    plt.xlabel('Time to hiring (years)',fontsize=18)
     ax = plt.gca()
     for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_fontsize(20)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_fontsize(18)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     
         
     wmodel = (phdy_hired_pool>2001) & (hired_pool==0) & (hirey_hired_pool>2010)
-    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=3,histtype='step',normed=1)
-    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=3,label='Model')
-    plt.legend(loc='upper left',fontsize='large',frameon=False)
+    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=2,histtype='step',normed=1)
+    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=2,label='Model')
+    plt.legend(loc='upper left',frameon=False,fontsize=14)
     
     #Female distrobution
     wuse = (phd_year>2001) & (gender==1)
     plt.subplot(212)
-    plt.title('Female',fontweight='bold')
-    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1)
-    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=3)
-    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3)
-    plt.ylabel('f',fontweight='bold',fontsize=18)
-    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    plt.title('Female',fontsize=16)
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=2,histtype='step',normed=1)
+    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=2)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=2)
+    plt.ylabel('f',fontsize=18)
+    plt.xlabel('Time to hiring (years)',fontsize=18)
     ax = plt.gca()
     for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_fontsize(20)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_fontsize(18)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     
         
     wmodel = (phdy_hired_pool>2001) & (hired_pool==1) & (hirey_hired_pool>2010)
-    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=3,histtype='step',normed=1)
-    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=3)
+    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=2,histtype='step',normed=1)
+    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=2)
     
     
 
@@ -650,50 +725,46 @@ def gendered_model2(success=[1,1,1,1,1,1,1,1,1,1],bias=1.,Nhire=10000):
     bins=np.arange(0,11)-.5
     #Male distrobution
     wuse = (phd_year>2001) & (gender==0)
-    plt.rc('axes',lw=3)
+    plt.rc('axes',lw=2)
     plt.subplot(211)
-    plt.title('Male',fontweight='bold')
-    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1,label=None)
-    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=3,label=None)
-    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3,label='Data')
-    plt.ylabel('f',fontweight='bold',fontsize=18)
-    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    plt.title('Male',fontsize=16)
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=2,histtype='step',normed=1,label=None)
+    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=2,label=None)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=2,label='Data')
+    plt.ylabel('f',fontsize=18)
+    plt.xlabel('Time to hiring (years)',fontsize=18)
     ax = plt.gca()
     for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_fontsize(20)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_fontsize(18)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     
         
     wmodel = (phdy_hired_pool>2001) & (hired_pool==0) & (hirey_hired_pool>2010)
-    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=3,histtype='step',normed=1,label=None)
-    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=3,label='Model')
-    plt.legend(loc='upper left',fontsize='large',frameon=False)
+    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=2,histtype='step',normed=1,label=None)
+    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=2,label='Model')
+    plt.legend(loc='upper left',fontsize=14,frameon=False)
     
     #Female distrobution
     wuse = (phd_year>2001) & (gender==1)
     plt.subplot(212)
-    plt.title('Female',fontweight='bold')
-    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1)
-    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=3)
-    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3)
-    plt.ylabel('f',fontweight='bold',fontsize=18)
-    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    plt.title('Female',fontsize=16)
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=2,histtype='step',normed=1)
+    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=2)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=2)
+    plt.ylabel('f',fontsize=18)
+    plt.xlabel('Time to hiring (years)',fontsize=18)
     ax = plt.gca()
     for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_fontsize(20)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_fontsize(18)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     
         
     wmodel = (phdy_hired_pool>2001) & (hired_pool==1) & (hirey_hired_pool>2010)
-    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=3,histtype='step',normed=1)
-    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=3)
-    plt.legend(('Data','Model'),loc='upper left',fontsize='large',frameon=False)
+    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=2,histtype='step',normed=1)
+    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=2)
+#    plt.legend(('Data','Model'),loc='upper left',fontsize='large',frameon=False)
 
 
     #It is hard to find a bias that substantially changes the distribution for women... A bias of 100 (women are 100x more likely to be hired than men) marginally changes the distribution. Even then it has a tail towards long timescales that is higher than the data...
@@ -813,49 +884,45 @@ def gendered_model3(success=[1,1,1,1,1,1,1,1,1,1],tau_male=1.,tau_female=1.):
     bins=np.arange(0,11)-.5
     #Male distrobution
     wuse = (phd_year>2001) & (gender==0)
-    plt.rc('axes',lw=3)
+    plt.rc('axes',lw=2)
     plt.subplot(211)
-    plt.title('Male',fontweight='bold')
-    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1,label=None)
-    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=3,label=None)
-    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3,label='Data')
-    plt.ylabel('f',fontweight='bold',fontsize=18)
-    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    plt.title('Male',fontsize=16)
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=2,histtype='step',normed=1,label=None)
+    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=2,label=None)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=2,label='Data')
+    plt.ylabel('f',fontsize=18)
+    plt.xlabel('Time to hiring (years)',fontsize=18)
     ax = plt.gca()
     for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_fontsize(20)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_fontsize(18)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     
         
     wmodel = (phdy_hired_pool>2001) & (hired_pool==0) & (hirey_hired_pool>2010)
-    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=3,histtype='step',normed=1,label=None)
-    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=3,label='Model')
-    plt.legend(loc='upper left',fontsize='large',frameon=False)
+    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=2,histtype='step',normed=1,label=None)
+    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=2,label='Model')
+    plt.legend(loc='upper left',fontsize=14,frameon=False)
     
     #Female distribution
     wuse = (phd_year>2001) & (gender==1)
     plt.subplot(212)
-    plt.title('Female',fontweight='bold')
-    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=3,histtype='step',normed=1)
-    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=3)
-    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=3)
-    plt.ylabel('f',fontweight='bold',fontsize=18)
-    plt.xlabel('Time to hiring (years)',fontweight='bold',fontsize=18)
+    plt.title('Female',fontsize=16)
+    p = plt.hist(hire_year[wuse]-phd_year[wuse],bins,color='k',lw=2,histtype='step',normed=1)
+    plt.errorbar(bins[:-1]+.5,p[0],yerr=np.sqrt(p[0]*wuse.sum())/wuse.sum(),fmt='ok',capthick=0.,elinewidth=2)
+    plt.axvline(np.mean(hire_year[wuse]-phd_year[wuse]),color='k',lw=2)
+    plt.ylabel('f',fontsize=18)
+    plt.xlabel('Time to hiring (years)',fontsize=18)
     ax = plt.gca()
     for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_fontsize(20)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_fontsize(18)
-        tick.label1.set_fontweight('bold')
+        tick.label1.set_fontsize(16)
     
         
     wmodel = (phdy_hired_pool>2001) & (hired_pool==1) & (hirey_hired_pool>2010)
-    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=3,histtype='step',normed=1)
-    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=3)
+    p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=2,histtype='step',normed=1)
+    plt.axvline(np.mean(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel]),color='r',lw=2)
     
     #tau_male=4.,tau_female=3.,success=[.01,.02,.1,.2,.33,.36,.34,.48,1.,1.] does a reasonable job of fitting both distributions. In this case, women leave the labor pool one year faster than men.
 
