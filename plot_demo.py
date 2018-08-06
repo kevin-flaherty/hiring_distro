@@ -623,7 +623,7 @@ def gendered_model1(success=[1,1,1,1,1,1,1,1,1,1],slope=.01,year0=2000):
         tick.label1.set_fontsize(16)
     for tick in ax.yaxis.get_major_ticks():
         tick.label1.set_fontsize(16)
-    
+    plt.text(-.6,.2,'Changing\n demographics',fontsize=14)
         
     wmodel = (phdy_hired_pool>2001) & (hired_pool==1) & (hirey_hired_pool>2010)
     p = plt.hist(hirey_hired_pool[wmodel]-phdy_hired_pool[wmodel],bins,color='r',lw=2,histtype='step',normed=1)
@@ -759,6 +759,8 @@ def gendered_model2(success=[1,1,1,1,1,1,1,1,1,1],bias=1.,Nhire=10000):
         tick.label1.set_fontsize(16)
     for tick in ax.yaxis.get_major_ticks():
         tick.label1.set_fontsize(16)
+    plt.ylim(0,.29)
+    plt.text(-.91,.26,'p$_{hire}$(female)>>p$_{hire}$(male)',fontsize=13)
     
         
     wmodel = (phdy_hired_pool>2001) & (hired_pool==1) & (hirey_hired_pool>2010)
@@ -918,6 +920,7 @@ def gendered_model3(success=[1,1,1,1,1,1,1,1,1,1],tau_male=1.,tau_female=1.):
         tick.label1.set_fontsize(16)
     for tick in ax.yaxis.get_major_ticks():
         tick.label1.set_fontsize(16)
+    plt.text(-.6,.20,'Leaving the \n labor market',fontsize=13)
     
         
     wmodel = (phdy_hired_pool>2001) & (hired_pool==1) & (hirey_hired_pool>2010)
@@ -1548,33 +1551,33 @@ def plot_df(tau_male=1.,tau_female=1.):
     taper_female[taper_female<0] = 0
 
     plt.rc('axes',lw=3)
-    plt.subplot(211)
+    #plt.subplot(211)
     plt.plot(np.arange(15),taper_male,color='k',lw=3)
-    plt.plot(np.arange(15),taper_female,color='r',lw=3)
-    #plt.xlabel('Time since PhD (years)',fontweight='bold',fontsize=18)
-    plt.ylabel('Fraction of PhDs \nleaving the labor market',fontweight='bold',fontsize=18)
+    plt.plot(np.arange(15),taper_female,color='r',lw=3,ls='--')
+    plt.xlabel('Time since PhD (years)',fontsize=18)
+    plt.ylabel('Fraction of PhDs \nleaving the labor market',fontsize=18)
     plt.legend(('Male','Female'),frameon=False,loc='upper left',fontsize='large')
     plt.xlim(0,14)
     ax = plt.gca()
     for tick in ax.xaxis.get_major_ticks():
         tick.label1.set_fontsize(20)
-        tick.label1.set_fontweight('bold')
+     #   tick.label1.set_fontweight('bold')
     for tick in ax.yaxis.get_major_ticks():
         tick.label1.set_fontsize(18)
-        tick.label1.set_fontweight('bold')
+     #   tick.label1.set_fontweight('bold')
 
-    plt.subplot(212)
-    plt.plot(np.arange(15),taper_female/taper_male,color='k',lw=3)
-    plt.ylabel('F(female)/F(male)',fontweight='bold',fontsize=18)
-    plt.xlabel('Time since PhD (years)',fontweight='bold',fontsize=18)
-    plt.xlim(0,14)
-    ax = plt.gca()
-    for tick in ax.xaxis.get_major_ticks():
-        tick.label1.set_fontsize(20)
-        tick.label1.set_fontweight('bold')
-    for tick in ax.yaxis.get_major_ticks():
-        tick.label1.set_fontsize(18)
-        tick.label1.set_fontweight('bold')
+    #plt.subplot(212)
+    #plt.plot(np.arange(15),taper_female/taper_male,color='k',lw=3)
+    #plt.ylabel('F(female)/F(male)',fontweight='bold',fontsize=18)
+    #plt.xlabel('Time since PhD (years)',fontweight='bold',fontsize=18)
+    #plt.xlim(0,14)
+    #ax = plt.gca()
+    #for tick in ax.xaxis.get_major_ticks():
+    #    tick.label1.set_fontsize(20)
+    #    tick.label1.set_fontweight('bold')
+    #for tick in ax.yaxis.get_major_ticks():
+    #    tick.label1.set_fontsize(18)
+    #    tick.label1.set_fontweight('bold')
 
 
 def gendered_model4(success=[1,1,1,1,1,1,1,1,1,1],fstar=.1,df=0.):

@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  20 JUN 2018 16:32
+This is pdfTeX, Version 3.14159265-2.6-1.40.16 (TeX Live 2015) (preloaded format=pdflatex 2015.5.24)  26 JUL 2018 10:40
 entering extended mode
  \write18 enabled.
  %&-line parsing enabled.
@@ -491,95 +491,102 @@ LaTeX Font Info:    Try loading font information for U+msb on input line 5.
 (/usr/local/texlive/2015/texmf-dist/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 )
-Overfull \vbox (12.62817pt too high) has occurred while \output is active []
+Overfull \vbox (10.29486pt too high) has occurred while \output is active []
 
 
 [1{/usr/local/texlive/2015/texmf-var/fonts/map/pdftex/updmap/pdftex.map}]
+Overfull \vbox (11.55629pt too high) has occurred while \output is active []
+
+
 [2]
-Overfull \vbox (3.55629pt too high) has occurred while \output is active []
+Overfull \vbox (2.99635pt too high) has occurred while \output is active []
 
 
-[3] <full_hiring_time.png, id=48, 462.528pt x 346.896pt>
+[3] <full_hiring_time.png, id=145, 462.528pt x 346.896pt>
 File: full_hiring_time.png Graphic file (type png)
 
 <use full_hiring_time.png>
-Package pdftex.def Info: full_hiring_time.png used on input line 46.
-(pdftex.def)             Requested size: 138.75946pt x 104.0696pt.
- <cc_hiring_time.png, id=50, 462.528pt x 346.896pt>
-File: cc_hiring_time.png Graphic file (type png)
+Package pdftex.def Info: full_hiring_time.png used on input line 60.
+(pdftex.def)             Requested size: 212.76546pt x 159.57408pt.
 
-<use cc_hiring_time.png>
-Package pdftex.def Info: cc_hiring_time.png used on input line 47.
-(pdftex.def)             Requested size: 138.75946pt x 104.0696pt.
-
-<gender_hiring_time.png, id=51, 462.528pt x 346.896pt>
+<gender_hiring_time.png, id=147, 462.528pt x 346.896pt>
 File: gender_hiring_time.png Graphic file (type png)
 
 <use gender_hiring_time.png>
-Package pdftex.def Info: gender_hiring_time.png used on input line 48.
-(pdftex.def)             Requested size: 138.75946pt x 104.0696pt.
- [4 <./full_hiring_time.png> <./cc_hiring_time.png> <./gender_hiring_time.png>]
- [5] <f_phd.png, id=70, 462.528pt x 346.896pt>
-File: f_phd.png Graphic file (type png)
+Package pdftex.def Info: gender_hiring_time.png used on input line 61.
+(pdftex.def)             Requested size: 212.76546pt x 159.57408pt.
+ [4 <./full_hiring_time.png> <./gender_hiring_time.png>] [5]
+Overfull \vbox (0.8896pt too high) has occurred while \output is active []
 
-<use f_phd.png>
-Package pdftex.def Info: f_phd.png used on input line 83.
+
+[6] <f_phd.png, id=189, 462.528pt x 346.896pt>
+File: f_phd.png Graphic file (type png)
+ <use f_phd.png>
+Package pdftex.def Info: f_phd.png used on input line 97.
 (pdftex.def)             Requested size: 277.51894pt x 208.13919pt.
- <model1.png, id=72, 526.8483pt x 410.4936pt>
+
+<model1.png, id=195, 479.8728pt x 416.9979pt>
 File: model1.png Graphic file (type png)
  <use model1.png>
-Package pdftex.def Info: model1.png used on input line 91.
-(pdftex.def)             Requested size: 316.11142pt x 246.29805pt.
-
-[6] [7 <./f_phd.png> <./model1.png>]
-<model2_b10.png, id=89, 526.8483pt x 410.4936pt>
+Package pdftex.def Info: model1.png used on input line 105.
+(pdftex.def)             Requested size: 287.9259pt x 250.20065pt.
+ [7 <./f_phd.png>] <model2_b10.png, id=205, 479.8728pt x 416.9979pt>
 File: model2_b10.png Graphic file (type png)
  <use model2_b10.png>
-Package pdftex.def Info: model2_b10.png used on input line 103.
-(pdftex.def)             Requested size: 316.11142pt x 246.29805pt.
- [8 <./model2_b10.png>] <model3.png, id=97, 526.8483pt x 410.4936pt>
+Package pdftex.def Info: model2_b10.png used on input line 117.
+(pdftex.def)             Requested size: 287.9259pt x 250.20065pt.
+
+[8 <./model1.png>] [9 <./model2_b10.png>]
+<model3.png, id=227, 479.8728pt x 416.9979pt>
 File: model3.png Graphic file (type png)
  <use model3.png>
-Package pdftex.def Info: model3.png used on input line 122.
-(pdftex.def)             Requested size: 316.11142pt x 246.29805pt.
+Package pdftex.def Info: model3.png used on input line 136.
+(pdftex.def)             Requested size: 287.9259pt x 250.20065pt.
+ [10 <./model3.png>] <df_model3.png, id=243, 462.528pt x 346.896pt>
+File: df_model3.png Graphic file (type png)
+ <use df_model3.png>
+Package pdftex.def Info: df_model3.png used on input line 146.
+(pdftex.def)             Requested size: 277.51894pt x 208.13919pt.
+ [11 <./df_model3.png>]
+Overfull \vbox (17.99635pt too high) has occurred while \output is active []
 
-[9]
 
-LaTeX Warning: Empty `thebibliography' environment on input line 138.
+[12] [13]
+Overfull \hbox (298.99315pt too wide) in paragraph at lines 222--223
+\OT1/cmr/m/n/10.95 the-[]truth-[]has-[]got-[]its-[]boots-[]on-[]what-[]the-[]ev
+idence-[]says-[]about-[]mr-[]damores-[]google-[]memo-[]bc93c8b2fdb9$[][]  
+ []
 
-[10 <./model3.png>]
-Package atveryend Info: Empty hook `AfterLastShipout' on input line 141.
+[14] [15]
+Package atveryend Info: Empty hook `AfterLastShipout' on input line 251.
  (./hiring_time.aux)
-Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 141.
-Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 141.
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right .
-
-
+Package atveryend Info: Executing hook `AtVeryEndDocument' on input line 251.
+Package atveryend Info: Empty hook `AtEndAfterFileList' on input line 251.
  ) 
 Here is how much of TeX's memory you used:
- 8728 strings out of 493089
- 121323 string characters out of 6134842
- 254417 words of memory out of 5000000
- 12090 multiletter control sequences out of 15000+600000
+ 8927 strings out of 493089
+ 123728 string characters out of 6134842
+ 261736 words of memory out of 5000000
+ 12242 multiletter control sequences out of 15000+600000
  15735 words of font info for 63 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 36i,7n,37p,1513b,344s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 36i,7n,37p,1902b,546s stack positions out of 5000i,500n,10000p,200000b,80000s
 </usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmbx10.pfb
 ></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmcsc10.pfb
-></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb>
-</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></
-usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></us
-r/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/l
-ocal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/loca
-l/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local
-/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/
-texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
-Output written on hiring_time.pdf (10 pages, 587160 bytes).
+></usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi10.pfb>
+</usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi12.pfb><
+/usr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmmi8.pfb></u
+sr/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr10.pfb></usr
+/local/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr12.pfb></usr/l
+ocal/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr7.pfb></usr/loca
+l/texlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmr8.pfb></usr/local/t
+exlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmsy10.pfb></usr/local/te
+xlive/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti10.pfb></usr/local/tex
+live/2015/texmf-dist/fonts/type1/public/amsfonts/cm/cmti12.pfb>
+Output written on hiring_time.pdf (15 pages, 668501 bytes).
 PDF statistics:
- 154 PDF objects out of 1000 (max. 8388607)
- 116 compressed objects within 2 object streams
- 33 named destinations out of 1000 (max. 500000)
+ 405 PDF objects out of 1000 (max. 8388607)
+ 352 compressed objects within 4 object streams
+ 80 named destinations out of 1000 (max. 500000)
  36 words of extra memory for PDF output out of 10000 (max. 10000000)
 
